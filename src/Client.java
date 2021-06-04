@@ -4,6 +4,7 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,6 +19,7 @@ import javax.swing.border.EmptyBorder;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
@@ -32,7 +34,10 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import java.awt.Font;
+
+import javax.print.DocFlavor.URL;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
 import java.awt.Color;
@@ -40,6 +45,11 @@ import java.awt.FlowLayout;
 import javax.swing.JTextField;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.Choice;
+import java.io.DataOutputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.Socket;
 
 public class Client extends JFrame implements ActionListener {
 
@@ -56,6 +66,7 @@ public class Client extends JFrame implements ActionListener {
 		// JFrame related
 		private JTextArea txtAreaLogs;
 		private JButton btnStart;
+		private JButton btnChoseFile;
 		private JPanel panelNorth;
 		private JLabel lblChatClient;
 		private JPanel panelNorthSouth;
@@ -113,7 +124,7 @@ public class Client extends JFrame implements ActionListener {
 		lblChatClient.setHorizontalAlignment(SwingConstants.CENTER);
 		lblChatClient.setFont(new Font("Tahoma", Font.PLAIN, 40));
 		panelNorth.add(lblChatClient);
-
+		
 		panelNorthSouth = new JPanel();
 		panelNorthSouth.setBounds(0, 49, 603, 33);
 		panelNorth.add(panelNorthSouth);
@@ -145,6 +156,8 @@ public class Client extends JFrame implements ActionListener {
 		btnStart.addActionListener(this);
 		btnStart.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
+	    
+		
 		txtIP = new JTextField();
 		try {
 	            txtIP.setText(InetAddress.getLocalHost().getHostAddress());
@@ -173,24 +186,43 @@ public class Client extends JFrame implements ActionListener {
 
 		panelSouth = new JPanel();
 		panelSouth.setBounds(5, 323, 603, 33);
-		FlowLayout fl_panelSouth = (FlowLayout) panelSouth.getLayout();
-		fl_panelSouth.setAlignment(FlowLayout.RIGHT);
 		contentPane.add(panelSouth);
 
 		txtMessage = new JTextField();
+		txtMessage.setBounds(10, 7, 386, 20);
 		txtMessage.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(FocusEvent e) {
 				getRootPane().setDefaultButton(btnSend);
 			}
 		});
+		panelSouth.setLayout(null);
 		panelSouth.add(txtMessage);
 		txtMessage.setColumns(50);
 
 		btnSend = new JButton("SEND");
+		btnSend.setBounds(406, 5, 77, 23);
 		btnSend.addActionListener(this);
 		btnSend.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		panelSouth.add(btnSend);
+		
+		btnChoseFile = new JButton("Chose File");
+		btnChoseFile.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				JFileChooser chooser = new JFileChooser();
+				chooser.setMultiSelectionEnabled(false);
+				
+				int x = chooser.showOpenDialog(null);
+				if(x == JFileChooser.APPROVE_OPTION) {
+					File f = chooser.getSelectedFile();
+					//URL fileUrl = f.toURI().toURL();
+					txtMessage.setText(f.getPath());
+				}
+			}
+		});
+		btnChoseFile.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		btnChoseFile.setBounds(493, 6, 100, 23);
+		panelSouth.add(btnChoseFile);
 	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -286,5 +318,4 @@ public class Client extends JFrame implements ActionListener {
 		}
 
 	}
-
 }
